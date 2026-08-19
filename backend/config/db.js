@@ -1,11 +1,5 @@
 const mysql = require("mysql2/promise");
 const fs = require("fs");
-const path = require("path");
-
-const caPath = path.join(
-  __dirname,
-  "../certs/ca.pem"
-);
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -15,7 +9,7 @@ const pool = mysql.createPool({
   port: Number(process.env.DB_PORT),
 
   ssl: {
-    ca: fs.readFileSync(caPath),
+    ca: fs.readFileSync("/etc/secrets/ca.pem"),
     rejectUnauthorized: true,
   },
 
@@ -28,16 +22,11 @@ async function connectDatabase() {
   try {
     const connection = await pool.getConnection();
 
-    console.log(
-      "✅ MySQL database connected successfully!"
-    );
+    console.log("✅ MySQL database connected successfully!");
 
     connection.release();
   } catch (error) {
-    console.error(
-      "❌ MySQL connection failed:"
-    );
-
+    console.error("❌ MySQL connection failed:");
     console.error(error.message);
   }
 }
